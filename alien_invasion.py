@@ -23,9 +23,9 @@ class AlienInvasion:
         # display.set_mode()返回的surface表示整个游戏窗口，激活游戏的动画循环后
          # 每经过一次循环都将自动重绘这个surface，将用户输入触发的所有变化都反应出来
         self.settings = Settings() #创建Settings实例
-        self.screen = pygame.display.set_mode((self.settings.screen_width,
-                                              self.settings.screen_height,
-                                              ))
+        self.screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+        self.settings.screen_width = self.screen.get_rect().width
+        self.settings.screen_height = self.screen.get_rect().height
         #self.screen = pygame.display.set_mode((1200, 800))
         pygame.display.set_caption("Alien Invasion")
         # 设置背景色
@@ -40,6 +40,7 @@ class AlienInvasion:
         while True:
             #重构后：
             self._check_events() #调用_check_events方法
+            self.ship.update()
             self._update_screen() #调用_update_screen方法
             # tick方法接受一个参数：游戏的帧率
             self.clock.tick(60)
@@ -57,6 +58,27 @@ class AlienInvasion:
             if event.type == pygame.QUIT:
                 # 进而调用sys.exit()来退出游戏
                 sys.exit()
+            elif event.type == pygame.KEYDOWN:
+                self._check_keydown_events(event)
+            elif event.type == pygame.KEYUP:
+                self._check_keyup_events(event)
+
+    def _check_keydown_events(self, event):
+        """响应按下"""
+        if event.key == pygame.K_RIGHT:
+            self.ship.moving_right = True
+        elif event.key == pygame.K_LEFT:
+            self.ship.moving_left = True
+        # 按q结束游戏
+        elif event.key == pygame.K_q:
+            sys.exit()
+
+    def _check_keyup_events(self, event):
+        """响应释放"""
+        if event.key == pygame.K_RIGHT:
+            self.ship.moving_right = False
+        elif event.key == pygame.K_LEFT:
+            self.ship.moving_left = False
     def _update_screen(self):
         """更新屏幕上的图像，并切换到新屏幕"""
         # 每次循环都重绘屏幕
